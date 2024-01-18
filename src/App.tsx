@@ -7,6 +7,9 @@ import {
   Text,
   useColorScheme,
   View,
+  TextInput,
+  FlatList,
+  Pressable
 } from 'react-native';
 
 import {
@@ -35,15 +38,12 @@ function App(): React.JSX.Element {
         textColor: '#000000',
       });
     }
-
     const inputAmt = parseFloat(inputValue);
-
     if (!isNaN(inputAmt)) {
       const converted = inputAmt * targetValue.value;
-      const result = `${targetValue.symbol} ${converted.toFixed(2)}`
+      const result = `${targetValue.symbol}  ${converted.toFixed(2)}`
       setResultValue(result)
       setTargetCurrency(targetValue.name)
-
     } else {
       Snackbar.show({
         text: `${inputValue} not a valid input`,
@@ -54,12 +54,44 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <SafeAreaView>
-      <StatusBar />
-      <View>
-        <Text>1</Text>
+    <>
+      <StatusBar  />
+      <View style={styles.container}>
+        <View style={styles.topContainer}>
+          <View style={styles.rupeesContainer}>
+            <Text style={styles.rupee}>??</Text>
+            <TextInput
+            maxLength={14}
+            value={inputValue}
+            clearButtonMode='always'
+            onChangeText={setInputValue}
+            keyboardType='number-pad'
+            placeholder='Enter some amount in Rupee'
+            />
+          </View>
+          {resultValue && (
+            <Text style={styles.resultTxt}>
+                {resultValue}
+            </Text>
+          )}
+        </View>
+        <View style={styles.bottomContainer}>
+          <FlatList 
+          numColumns={3}
+          data={currencyByRupee}
+          keyExtractor={item => item.name}
+          renderItem={({item})=>(
+            <Pressable
+            style={[styles.button,targetCurrency===item.name && styles.selected]}
+            onPress={()=>buttonPressed(item)}
+            >
+              <CurrencyButton {...item} />
+            </Pressable>
+          )}
+          />
+        </View>
       </View>
-    </SafeAreaView>
+    </>
   );
 }
 
